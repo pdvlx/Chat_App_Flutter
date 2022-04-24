@@ -78,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             email: email, password: password);
                     if (returningUser != null) {
                       progressBar.dismiss();
+                      
                       Navigator.pushNamed(context, ChatScreen.route);
                     }
                   } catch (e) {

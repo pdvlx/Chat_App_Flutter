@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/components/padding_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+
+final _fireStore = FirebaseFirestore.instance;
+
 
 class RegistrationScreen extends StatefulWidget {
   static const String route = "registration_screen";
@@ -57,7 +61,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   height: 8.0,
                 ),
                 TextField(
-                  obscureText: true,
                   textAlign: TextAlign.center,
                   onChanged: (value) {
                     email = value;
@@ -88,11 +91,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     final newUser = await _auth.createUserWithEmailAndPassword(
                         email: email, password: password);
 
+                    await newUser.user.updateDisplayName(username);
+
                     if (newUser != null) {
-                      // var user = await _auth.currentUser;
-                      // user
-                      //     .updateDisplayName(username)
-                      //     .then((value) => print(user));
+                      _fireStore.collection('${username}_friends').add({
+
+                      });
                       progressBar.dismiss();
                       Navigator.pushNamed(context, ChatScreen.route);
                     }

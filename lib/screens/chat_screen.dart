@@ -1,13 +1,16 @@
+import 'package:flash_chat/screens/friendlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 final _fireStore = FirebaseFirestore.instance;
 User loggedInUser;
 
 class ChatScreen extends StatefulWidget {
   static const String route = "chat_screen";
+
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -16,7 +19,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-
   String messageText;
 
   void getCurrentUser() async {
@@ -24,7 +26,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final user = _auth.currentUser;
       if (user != null) {
         loggedInUser = user;
-        print(loggedInUser.email);
+        print(loggedInUser.displayName);
       }
     } on Exception catch (e) {
       print(e);
@@ -41,8 +43,26 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading:false,
         leading: null,
         actions: <Widget>[
+          IconButton(
+            onPressed: (){
+              print(loggedInUser);
+              //Navigator.pushNamed(context, FriendListScreen.route);
+              print('add friend functionality');
+            },
+            icon: Icon(Icons.person_add,
+              color: Colors.white,
+            ),
+          ),
+          IconButton(
+            onPressed: (){
+              Navigator.pushNamed(context, FriendListScreen.route);
+            },
+            icon: Icon(Icons.new_label,
+              color: Colors.white,),
+          ),
           IconButton(
               icon: Icon(
                 Icons.logout,
