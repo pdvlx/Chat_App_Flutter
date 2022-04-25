@@ -49,12 +49,9 @@ class _FriendListScreenState extends State<FriendListScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
 
-              print('snapshot has data lol');
               final friends = snapshot.data.docs;
 
               if(friends.isNotEmpty){
-                print('${friends.isEmpty} Emptymmis');
-                //print('${snapshot.data.docs.} neymis');
                 List<Widget> messageWidgets = [];
                 for (var friend in friends) {
                   // final messageText = message.get('text');

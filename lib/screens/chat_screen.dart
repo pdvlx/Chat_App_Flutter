@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 final _fireStore = FirebaseFirestore.instance;
+final _auth = FirebaseAuth.instance;
 User loggedInUser;
 
 class ChatScreen extends StatefulWidget {
@@ -102,6 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       _fireStore.collection('messages').add({
                         'text': messageText,
                         'sender': loggedInUser.email,
+                        'username': loggedInUser.displayName,
                         'createdAt': Timestamp.now(),
                       });
                     },
@@ -134,11 +136,12 @@ class MessagesStream extends StatelessWidget {
           List<MessageBubble> messageWidgets = [];
           for (var message in messages) {
             final messageText = message.get('text');
-            final messageSender = message.get('sender');
-            final currentUser = loggedInUser.email;
+            final messageSenderEmail = message.get('sender');
+            final messageSenderUsername = message.get('username');
+            final currentUserEmail = loggedInUser.email;
 
             final messageWidget = MessageBubble(
-                messageSender, messageText, currentUser == messageSender);
+                messageSenderUsername, messageText, currentUserEmail == messageSenderEmail);
             messageWidgets.add(messageWidget);
           }
           return Expanded(
