@@ -1,8 +1,9 @@
+import 'package:flash_chat/NetworkController.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
-
+import 'package:provider/provider.dart';
 
 final _fireStore = FirebaseFirestore.instance;
 
@@ -17,20 +18,6 @@ class FriendListScreen extends StatefulWidget {
 class _FriendListScreenState extends State<FriendListScreen> {
   final _auth = FirebaseAuth.instance;
 
-
-
-  // void getCurrentUser() async {
-  //   try {
-  //     final user = _auth.currentUser;
-  //     if (user != null) {
-  //       loggedInUser = user;
-  //       print(loggedInUser.email);
-  //     }
-  //   } on Exception catch (e) {
-  //     print(e);
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -40,33 +27,63 @@ class _FriendListScreenState extends State<FriendListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent,
+      //returning all of the friends that users have.
+      //backgroundColor: Colors.deepPurpleAccent,
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
           stream: _fireStore
-              .collection('${loggedInUser.displayName}_friends')
+              .collection('${loggedInUser.displayName}_user_data')
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
 
-              final friends = snapshot.data.docs;
+              final user_data = snapshot.data.docs;
 
-              if(friends.isNotEmpty){
-                List<Widget> messageWidgets = [];
-                for (var friend in friends) {
-                  // final messageText = message.get('text');
-                  // final messageSender = message.get('sender');
-                  // final currentUser = loggedInUser.email;
+              if(user_data.isNotEmpty){
+                List<Widget> friendRelatedWidgets = [];
+                for (var udata in user_data) {
+                  final incoming_friendreq = udata.get('incoming_friend_requests');
+                  final sent_friendreq = udata.get('sent_friend_requests');
+                  final friends = udata.get('friends');
+                  final id = udata.get('id');
+                  Widget SizedBoxForCleanUI = SizedBox(height: 10.0,);
+                  Widget DividerWidget = Divider(thickness: 3.0,);
 
-                  // final messageWidget = MessageBubble(
-                  //     messageSender, messageText, currentUser == messageSender);
-                  // messageWidgets.add(messageWidget);
+                  Widget FriendsRequestWidget = Text('Friend Requests' , style: TextStyle(fontSize: 35.0 , color: Colors.green),textAlign: TextAlign.center,);
+                  friendRelatedWidgets.add(FriendsRequestWidget);
+                  friendRelatedWidgets.add(DividerWidget);
+
+
+                  // Incoming Friend Request Array below
+                  for(var i=0; i<incoming_friendreq.length ; i++){
+                    final incomingReqTile = IncomingFriendReqTile(incoming_friendreq[i]);
+                    friendRelatedWidgets.add(incomingReqTile);
+                    friendRelatedWidgets.add(SizedBoxForCleanUI);
+
+                  }
+
+                  Widget FriendsTextWidget = Text('Friends' , style: TextStyle(fontSize: 35.0 , color: Colors.green),textAlign: TextAlign.center,);
+
+                  friendRelatedWidgets.add(FriendsTextWidget);
+                  friendRelatedWidgets.add(DividerWidget);
+
+                  //  //Sent requests below
+                  // for(var i=0; i<sent_friendreq.length ; i++){
+                  //   final sentReqTile = FriendRequestTile(sent_friendreq[i]);
+                  //   friendRelatedWidgets.add(sentReqTile);
+                  //
+                  // }
+
+                  // Friend Array below
+                  for(var i=0; i<friends.length ; i++){
+                    final friendTile = FriendTile(friends[i]);
+                    friendRelatedWidgets.add(friendTile);
+                    friendRelatedWidgets.add(SizedBoxForCleanUI);
+                  }
                 }
-                return ListView(
-                  reverse: true,
-                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-                  children: [Text('Data var hala lmao'),
-                  ],
+                return Column(
+
+                  children: friendRelatedWidgets,
                 );
               }
               else{
@@ -76,9 +93,6 @@ class _FriendListScreenState extends State<FriendListScreen> {
                       fontSize: 20.0,
                       color: Colors.grey[800],
                     ),),
-                  // child: CircularProgressIndicator(
-                  //   backgroundColor: Colors.lightBlueAccent,
-                  // ),
                 );
               }
 
@@ -90,6 +104,93 @@ class _FriendListScreenState extends State<FriendListScreen> {
               );
           },
         ),
+      ),
+    );
+  }
+}
+
+// class FriendRequestTile extends StatelessWidget {
+//
+//   FriendRequestTile(this.requestedUser);
+//   final String requestedUser;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(20.0),
+//         color: Colors.white70,
+//       ),
+//       child: Text('$requestedUser <= you requested to be friend.',
+//       style: TextStyle(
+//         color: Colors.black54,
+//         fontSize: 25.0,
+//       ),),
+//     );
+//   }
+// }
+class FriendTile extends StatelessWidget {
+
+  FriendTile(this.friend);
+  final String friend;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: Colors.white70,
+      ),
+      child: Text('$friend',
+        style: TextStyle(
+          color: Colors.black54,
+          fontSize: 25.0,
+        ),
+      ),
+    );
+  }
+}
+
+class IncomingFriendReqTile extends StatelessWidget {
+
+  IncomingFriendReqTile(this.incoming_friend_req);
+  final String incoming_friend_req;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: Colors.white70,
+      ),
+      child: Row(
+        children: [
+          Text('$incoming_friend_req ',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 25.0,
+            ),),
+          SizedBox(width: 180,),
+          GestureDetector(
+            onTap: () async {
+              await Provider.of<Network_Controller>(context,listen: false).AddFriend(incoming_friend_req, loggedInUser.displayName);
+              print('friend accepted');
+            },
+            child: Container(
+              color: Colors.green,
+                child: Icon(Icons.check, color: Colors.white,size: 35.0,),),
+          ),
+          SizedBox(width: 20,),
+          GestureDetector(
+            onTap: (){print('friend declined');},
+            child: Container(
+                color:Colors.red,
+                child: Icon(Icons.close,
+                  color: Colors.white,
+                size: 35.0,),),
+          ),
+        ],
       ),
     );
   }

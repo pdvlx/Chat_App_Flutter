@@ -93,10 +93,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                     await newUser.user.updateDisplayName(username);
 
-                    if (newUser != null) {
-                      _fireStore.collection('${username}_friends').add({
 
+
+                    if (newUser != null) {
+
+                      DocumentReference docRef = await _fireStore.collection('${username}_user_data').add({
+                        'friends': [],
+                        'sent_friend_requests' : [],
+                        'incoming_friend_requests' :[],
+                        'private_conversations' : [],
                       });
+                      String docId = docRef.id;
+                      await FirebaseFirestore.instance.collection('${username}_user_data').doc(docId).update(
+                          {
+                            'id' : docId
+                          });
+
                       progressBar.dismiss();
                       Navigator.pushNamed(context, ChatScreen.route);
                     }

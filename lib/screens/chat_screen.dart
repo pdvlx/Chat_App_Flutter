@@ -1,9 +1,10 @@
+import 'package:flash_chat/NetworkController.dart';
 import 'package:flash_chat/screens/friendlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:provider/provider.dart';
 
 final _fireStore = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
@@ -52,6 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
               print(loggedInUser);
               //Navigator.pushNamed(context, FriendListScreen.route);
               print('add friend functionality');
+
             },
             icon: Icon(Icons.person_add,
               color: Colors.white,
@@ -202,32 +204,74 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
-      child: Column(
-        crossAxisAlignment: changeAlignment(isCurrentUser),
-        children: [
-          Text(
-            sender,
-            style: TextStyle(
-              fontSize: 13.0,
-              color: Colors.blueGrey,
+      child: GestureDetector(
+        onLongPress: (){
+          if(!isCurrentUser){
+            try {
+              showModalBottomSheet(context: context,
+                builder: (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading:Icon(Icons.person_add),
+                      title: Text('Send friend request'),
+                      onTap: () async{
+
+
+                        var SenderDocRef = await Provider.of<Network_Controller>(context,listen: false).getDocumentRef(loggedInUser.displayName);
+                        var ReceiverDocRef = await Provider.of<Network_Controller>(context,listen: false).getDocumentRef(sender);
+
+
+                        await FirebaseFirestore.instance.collection('${loggedInUser.displayName}_user_data').doc(SenderDocRef).update(
+                            {
+                              'sent_friend_requests': FieldValue.arrayUnion([sender])
+                            });
+                        await FirebaseFirestore.instance.collection('${sender}_user_data').doc(ReceiverDocRef).update(
+                            {
+                              'incoming_friend_requests': FieldValue.arrayUnion([loggedInUser.displayName])
+                            });
+
+                        print('request sended to $sender');
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            } catch (e, s) {
+              print(s);
+            }
+          }
+        },
+        child: Column(
+          crossAxisAlignment: changeAlignment(isCurrentUser),
+          children: [
+            Text(
+              sender,
+              style: TextStyle(
+                fontSize: 15.0,
+                color: Colors.blueGrey,
+              ),
             ),
-          ),
-          Material(
-            elevation: 5.0,
-            borderRadius: changeBorderRadius(isCurrentUser),
-            color: changeColorMessages(isCurrentUser),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-              child: Text(
+            Material(
+              elevation: 5.0,
+              borderRadius: changeBorderRadius(isCurrentUser),
+              color: changeColorMessages(isCurrentUser),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                child: Text(
                 '$text',
                 style: TextStyle(
                   color: isCurrentUser ? Colors.white : Colors.black,
                   fontSize: 15.0,
                 ),
               ),
+
+
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
