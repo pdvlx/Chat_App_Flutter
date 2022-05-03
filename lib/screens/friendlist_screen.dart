@@ -1,4 +1,5 @@
 import 'package:flash_chat/NetworkController.dart';
+import 'package:flash_chat/screens/private_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,12 +17,10 @@ class FriendListScreen extends StatefulWidget {
 }
 
 class _FriendListScreenState extends State<FriendListScreen> {
-  final _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-    //getCurrentUser();
   }
 
   @override
@@ -135,17 +134,31 @@ class FriendTile extends StatelessWidget {
   final String friend;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.topLeft,
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: Colors.white70,
-      ),
-      child: Text('$friend',
-        style: TextStyle(
-          color: Colors.black54,
-          fontSize: 25.0,
+    return GestureDetector(
+      onTap: () async{
+
+        var private_session_id = await Provider.of<Network_Controller>(context, listen: false).GetPrivateSessionId(loggedInUser.displayName, friend);
+
+        Navigator.push(
+          context, MaterialPageRoute(builder: (context) =>  PrivateChatScreen(friend,private_session_id)),
+        );
+
+        //Navigator.pushNamed(context, PrivateChatScreen.route);
+
+        print('youve tapped a friend. $friend');
+      },
+      child: Container(
+        alignment: Alignment.topLeft,
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: Colors.white70,
+        ),
+        child: Text('$friend',
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 25.0,
+          ),
         ),
       ),
     );

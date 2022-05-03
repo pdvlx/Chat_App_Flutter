@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flash_chat/screens/friendlist_screen.dart';
+import 'package:flash_chat/screens/private_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flash_chat/screens/login_screen.dart';
@@ -32,6 +33,7 @@ class FlashChat extends StatelessWidget {
           RegistrationScreen.route: (context) => RegistrationScreen(),
           ChatScreen.route: (context) => ChatScreen(),
           FriendListScreen.route: (context) => FriendListScreen(),
+         // PrivateChatScreen.route: (context) => PrivateChatScreen(),
         },
       ),
     );
