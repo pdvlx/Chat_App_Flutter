@@ -26,3 +26,5 @@ And of course users friend list screen.
 All of the UIs is not finished and if project looking like i didn't(by the time you saw the repo) you should update it. MessageBubble class and Friendlist widgets is 
 seperated from hierarchy so you can easily update the majority of the UI just by changing these.
 
+
+Of course credits to @AngelaYu for the amazing flutter course.
