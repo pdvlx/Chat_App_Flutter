@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
 class Network_Controller {
   final _fireStore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
   var uuid = Uuid();
 
   Future<String> getDocumentRef (String userDisplayName) async{
@@ -40,13 +40,8 @@ class Network_Controller {
          });
 
      await CreatePrivateSessionBetween(SenderUsername, ReceiverUsername);
-
-
-
-
   }
 
-  // PROJECT DONT USE SESSION ID METHODS YET. I WILL ADD THESE FOR SECURITY REASONS LATER.
 
   Future<String> GetPrivateSessionId(String currentUser, String UsersFriend) async{
 
@@ -87,6 +82,8 @@ class Network_Controller {
 
   }
 
+
+  // THIS IS SEPERATED BECAUSE IN THE LATER WE MAYBE WILL ADD ENCRYPTION TO SESSIONS OR/AND MESSAGES.
   void CreatePrivateSessionBetween(String SenderUsername, String ReceiverUsername) async {
     var senderDocref = await  getDocumentRef(SenderUsername);
     var receiverDocref = await  getDocumentRef(ReceiverUsername);
@@ -107,6 +104,40 @@ class Network_Controller {
 
     });
   }
+
+  void SendFriendRequest(String sentTo) async{
+
+
+    var loggedInUser = await getCurrentUser();
+
+    var SenderDocRef = await getDocumentRef(loggedInUser.displayName);
+    var ReceiverDocRef = await getDocumentRef(sentTo);
+
+
+    await FirebaseFirestore.instance.collection('${loggedInUser.displayName}_user_data').doc(SenderDocRef).update(
+        {
+          'sent_friend_requests': FieldValue.arrayUnion([sentTo])
+        });
+    await FirebaseFirestore.instance.collection('${sentTo}_user_data').doc(ReceiverDocRef).update(
+        {
+          'incoming_friend_requests': FieldValue.arrayUnion([loggedInUser.displayName])
+        });
+
+    print('request sended to $sentTo');
+  }
+
+  Future<User> getCurrentUser() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        return user;
+      }
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+
 }
 
 
