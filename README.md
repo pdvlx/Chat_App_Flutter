@@ -19,7 +19,7 @@ friend request.
 
 And of course users friend list screen. 
 
-![friendscr](https://user-images.githubusercontent.com/33608786/167624193-9306088b-4eae-403e-bef1-711e2fa6def7.png)
+![friendscr](https://user-images.githubusercontent.com/33608786/168382343-cbc1a3fb-dcce-402a-a524-05c0250f5198.png))
 
 
 
