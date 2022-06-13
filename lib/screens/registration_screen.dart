@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/components/padding_button.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flash_chat/components/padding_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 
 final _fireStore = FirebaseFirestore.instance;
-
 
 class RegistrationScreen extends StatefulWidget {
   static const String route = "registration_screen";
@@ -93,21 +92,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                     await newUser.user.updateDisplayName(username);
 
-
-
                     if (newUser != null) {
-
-                      DocumentReference docRef = await _fireStore.collection('${username}_user_data').add({
+                      DocumentReference docRef = await _fireStore
+                          .collection('${username}_user_data')
+                          .add({
                         'friends': [],
-                        'sent_friend_requests' : [],
-                        'incoming_friend_requests' :[],
-                        'private_conversations' : [],
+                        'sent_friend_requests': [],
+                        'incoming_friend_requests': [],
+                        'private_conversations': [],
                       });
                       String docId = docRef.id;
-                      await FirebaseFirestore.instance.collection('${username}_user_data').doc(docId).update(
-                          {
-                            'id' : docId
-                          });
+                      await FirebaseFirestore.instance
+                          .collection('${username}_user_data')
+                          .doc(docId)
+                          .update({'id': docId});
 
                       progressBar.dismiss();
                       Navigator.pushNamed(context, ChatScreen.route);

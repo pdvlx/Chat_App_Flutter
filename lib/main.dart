@@ -1,13 +1,14 @@
+import 'dart:ffi';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flash_chat/NetworkController.dart';
+import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flash_chat/screens/friendlist_screen.dart';
-import 'package:flash_chat/screens/private_chat_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
-import 'package:flash_chat/screens/chat_screen.dart';
+import 'package:flash_chat/screens/welcome_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flash_chat/NetworkController.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ void main() async {
 class FlashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Provider(
+    return ChangeNotifierProvider(
       create: (context) => Network_Controller(),
       child: MaterialApp(
         theme: ThemeData.dark().copyWith(
